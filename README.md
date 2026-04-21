@@ -1,12 +1,13 @@
 # API de Tarefas
 
-API REST para gerenciamento de tarefas, desenvolvida com **Node.js**, **Express** e **MySQL**.
+API REST para gerenciamento de tarefas com autenticação JWT, desenvolvida com **Node.js**, **Express** e **MySQL**.
 
 ## Tecnologias
 
-- Node.js
-- Express
-- MySQL
+- Node.js + Express
+- MySQL + mysql2
+- JSON Web Token (JWT)
+- bcryptjs
 - dotenv
 
 ## Como rodar o projeto
@@ -26,21 +27,20 @@ npm install
 ```bash
 cp .env.example .env
 ```
-Edite o `.env` com suas credenciais do MySQL.
+Edite o `.env` com suas credenciais do MySQL e uma chave secreta para o JWT.
 
 ### 4. Crie o banco de dados
-Execute o arquivo `database.sql` no seu MySQL:
 ```bash
 mysql -u root -p < database.sql
 ```
 
 ### 5. Inicie o servidor
 ```bash
-# Produção
-npm start
-
 # Desenvolvimento (auto-reload)
 npm run dev
+
+# Produção
+npm start
 ```
 
 A API estará disponível em `http://localhost:3000`
@@ -49,9 +49,18 @@ A API estará disponível em `http://localhost:3000`
 
 ## Endpoints
 
+### Autenticação (pública)
+
 | Método | Rota | Descrição |
 |--------|------|-----------|
-| GET | `/tarefas` | Lista todas as tarefas |
+| POST | `/auth/registrar` | Cria um novo usuário |
+| POST | `/auth/login` | Realiza login e retorna o token |
+
+### Tarefas (requer token JWT)
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/tarefas` | Lista as tarefas do usuário |
 | GET | `/tarefas/:id` | Busca uma tarefa por ID |
 | POST | `/tarefas` | Cria uma nova tarefa |
 | PUT | `/tarefas/:id` | Atualiza uma tarefa |
@@ -61,28 +70,58 @@ A API estará disponível em `http://localhost:3000`
 
 ## Exemplos de uso
 
-### Criar tarefa
+### 1. Registrar usuário
+```bash
+curl -X POST http://localhost:3000/auth/registrar \
+  -H "Content-Type: application/json" \
+  -d '{"nome": "Jaili", "email": "jaili@email.com", "senha": "123456"}'
+```
+
+### 2. Login (guarde o token retornado)
+```bash
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "jaili@email.com", "senha": "123456"}'
+```
+
+### 3. Criar tarefa (com token)
 ```bash
 curl -X POST http://localhost:3000/tarefas \
   -H "Content-Type: application/json" \
-  -d '{"titulo": "Estudar Node.js", "descricao": "Praticar APIs REST"}'
+  -H "Authorization: Bearer SEU_TOKEN_AQUI" \
+  -d '{"titulo": "Estudar JWT", "descricao": "Entender autenticação por token"}'
 ```
 
-### Listar todas
+### 4. Listar tarefas
 ```bash
-curl http://localhost:3000/tarefas
+curl http://localhost:3000/tarefas \
+  -H "Authorization: Bearer SEU_TOKEN_AQUI"
 ```
 
-### Atualizar tarefa
+### 5. Atualizar tarefa
 ```bash
 curl -X PUT http://localhost:3000/tarefas/1 \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer SEU_TOKEN_AQUI" \
   -d '{"concluida": true}'
 ```
 
-### Deletar tarefa
+### 6. Deletar tarefa
 ```bash
-curl -X DELETE http://localhost:3000/tarefas/1
+curl -X DELETE http://localhost:3000/tarefas/1 \
+  -H "Authorization: Bearer SEU_TOKEN_AQUI"
+```
+
+---
+
+## Como funciona a autenticação
+
+```
+1. Usuário faz POST /auth/login com email e senha
+2. API valida as credenciais e retorna um token JWT
+3. Usuário envia o token no header de todas as requisições:
+   Authorization: Bearer <token>
+4. API valida o token e libera o acesso (token expira em 8h)
 ```
 
 ---
@@ -93,15 +132,19 @@ curl -X DELETE http://localhost:3000/tarefas/1
 api-tarefas/
 ├── src/
 │   ├── config/
-│   │   └── db.js            # Conexão com o MySQL
+│   │   └── db.js                  # Conexão com MySQL
 │   ├── controllers/
-│   │   └── tarefaController.js  # Lógica das rotas
+│   │   ├── authController.js      # Registro e login
+│   │   └── tarefaController.js    # CRUD de tarefas
+│   ├── middlewares/
+│   │   └── auth.js                # Validação do token JWT
 │   ├── routes/
-│   │   └── tarefas.js       # Definição das rotas
-│   └── index.js             # Entrada da aplicação
+│   │   ├── auth.js                # Rotas de autenticação
+│   │   └── tarefas.js             # Rotas de tarefas
+│   └── index.js                   # Entrada da aplicação
 ├── .env.example
 ├── .gitignore
-├── database.sql             # Script do banco de dados
+├── database.sql
 └── package.json
 ```
 
