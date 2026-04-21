@@ -1,0 +1,22 @@
+{
+  "name": "api-tarefas",
+  "version": "1.0.0",
+  "description": "API REST de gerenciamento de tarefas com Node.js, Express e MySQL",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": ["api", "rest", "nodejs", "express", "mysql", "crud"],
+  "author": "Jaili Martins",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mysql2": "^3.22.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
