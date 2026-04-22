@@ -45,6 +45,10 @@ npm start
 
 A API estará disponível em `http://localhost:3000`
 
+## Deploy
+
+API em produção: **https://api-tarefas-production-8836.up.railway.app**
+
 ---
 
 ## Endpoints
