@@ -8,12 +8,18 @@ const autenticar    = require('./middlewares/auth')
 const app = express()
 app.use(express.json())
 
-// Front-end estático
+// Rotas da API ANTES do static (prioridade)
+app.use('/auth',    authRouter)
+app.use('/tarefas', autenticar, tarefasRouter)
+
+// Front-end estático (depois das rotas)
 app.use(express.static(path.join(__dirname, '..', 'public')))
 
-// Rotas da API
-app.use('/auth', authRouter)
-app.use('/tarefas', autenticar, tarefasRouter)
+// Erro genérico — sempre retorna JSON
+app.use((err, req, res, next) => {
+  console.error(err)
+  res.status(500).json({ erro: 'Erro interno no servidor' })
+})
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => console.log(`Servidor rodando em http://localhost:${PORT}`))
