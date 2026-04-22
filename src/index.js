@@ -1,5 +1,6 @@
 require('dotenv').config()
 const express = require('express')
+const path    = require('path')
 const authRouter    = require('./routes/auth')
 const tarefasRouter = require('./routes/tarefas')
 const autenticar    = require('./middlewares/auth')
@@ -7,13 +8,11 @@ const autenticar    = require('./middlewares/auth')
 const app = express()
 app.use(express.json())
 
-// Rotas públicas
-app.get('/', (req, res) => {
-  res.json({ mensagem: 'API de Tarefas — online', versao: '2.0.0' })
-})
-app.use('/auth', authRouter)
+// Front-end estático
+app.use(express.static(path.join(__dirname, '..', 'public')))
 
-// Rotas protegidas (exigem token)
+// Rotas da API
+app.use('/auth', authRouter)
 app.use('/tarefas', autenticar, tarefasRouter)
 
 const PORT = process.env.PORT || 3000

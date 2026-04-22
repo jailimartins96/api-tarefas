@@ -16,6 +16,8 @@ CREATE TABLE IF NOT EXISTS tarefas (
   titulo      VARCHAR(255) NOT NULL,
   descricao   TEXT,
   concluida   BOOLEAN DEFAULT FALSE,
+  prioridade  ENUM('baixa','media','alta') DEFAULT 'media',
+  prazo       DATETIME NULL,
   criada_em   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
