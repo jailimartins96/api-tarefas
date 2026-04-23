@@ -17,8 +17,8 @@ app.use(express.static(path.join(__dirname, '..', 'public')))
 
 // Erro genérico — sempre retorna JSON
 app.use((err, req, res, next) => {
-  console.error(err)
-  res.status(500).json({ erro: 'Erro interno no servidor' })
+  console.error('ERRO:', err.message)
+  res.status(500).json({ erro: err.message || 'Erro interno no servidor' })
 })
 
 const PORT = process.env.PORT || 3000
