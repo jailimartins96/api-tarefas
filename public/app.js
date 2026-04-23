@@ -210,15 +210,14 @@ function renderTarefas() {
   const container = document.getElementById('task-list')
   const empty     = document.getElementById('empty-state')
 
+  container.innerHTML = ''
+
   if (!lista.length) {
-    container.innerHTML = ''
-    container.appendChild(empty)
     empty.classList.remove('hidden')
     return
   }
 
   empty.classList.add('hidden')
-  container.innerHTML = ''
   lista.forEach(t => container.appendChild(criarCard(t)))
 }
 
